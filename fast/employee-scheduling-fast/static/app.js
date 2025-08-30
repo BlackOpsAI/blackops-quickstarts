@@ -39,6 +39,16 @@ let windowStart = JSJoda.LocalDate.now().toString();
 let windowEnd = JSJoda.LocalDate.parse(windowStart).plusDays(7).toString();
 
 $(document).ready(function () {
+    // Ensure all resources are loaded before initializing
+    $(window).on('load', function() {
+        initializeApp();
+    });
+    
+    // Fallback if window load event doesn't fire
+    setTimeout(initializeApp, 100);
+});
+
+function initializeApp() {
     replaceQuickstartTimefoldAutoHeaderFooter();
 
     $("#solveButton").click(function () {
@@ -60,7 +70,7 @@ $(document).ready(function () {
 
     setupAjax();
     fetchDemoData();
-});
+}
 
 function setupAjax() {
     $.ajaxSetup({
@@ -163,11 +173,24 @@ function refreshSchedule() {
 }
 
 function renderSchedule(schedule) {
+    console.log('Rendering schedule:', schedule);
+    
+    if (!schedule) {
+        console.error('No schedule data provided to renderSchedule');
+        return;
+    }
+    
     refreshSolvingButtons(schedule.solverStatus != null && schedule.solverStatus !== "NOT_SOLVING");
     $("#score").text("Score: " + (schedule.score == null ? "?" : schedule.score));
 
     const unassignedShifts = $("#unassignedShifts");
     const groups = [];
+
+    // Check if schedule.shifts exists and is an array
+    if (!schedule.shifts || !Array.isArray(schedule.shifts) || schedule.shifts.length === 0) {
+        console.warn('No shifts data available in schedule');
+        return;
+    }
 
     // Show only first 7 days of draft
     const scheduleStart = schedule.shifts.map(shift => JSJoda.LocalDateTime.parse(shift.start).toLocalDate()).sort()[0].toString();
@@ -184,6 +207,11 @@ function renderSchedule(schedule) {
     byEmployeeItemDataSet.clear();
     byLocationItemDataSet.clear();
 
+    // Check if schedule.employees exists and is an array
+    if (!schedule.employees || !Array.isArray(schedule.employees)) {
+        console.warn('No employees data available in schedule');
+        return;
+    }
 
     schedule.employees.forEach((employee, index) => {
         const employeeGroupElement = $('<div class="card-body p-2"/>')
@@ -301,6 +329,12 @@ function renderSchedule(schedule) {
 }
 
 function solve() {
+    if (!loadedSchedule) {
+        showError("No schedule data loaded. Please wait for the data to load or refresh the page.");
+        return;
+    }
+    
+    console.log('Sending schedule data for solving:', loadedSchedule);
     $.post("/schedules", JSON.stringify(loadedSchedule), function (data) {
         scheduleId = data;
         refreshSolvingButtons(true);
