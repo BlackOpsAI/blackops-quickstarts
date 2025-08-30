@@ -38,6 +38,16 @@ let viewType = "R";
 
 
 $(document).ready(function () {
+    // Ensure all resources are loaded before initializing
+    $(window).on('load', function() {
+        initializeApp();
+    });
+    
+    // Fallback if window load event doesn't fire
+    setTimeout(initializeApp, 100);
+});
+
+function initializeApp() {
     replaceQuickstartTimefoldAutoHeaderFooter();
 
     $("#solveButton").click(function () {
@@ -61,7 +71,7 @@ $(document).ready(function () {
     });
     setupAjax();
     refreshSchedule();
-});
+}
 
 
 function setupAjax() {
@@ -130,6 +140,12 @@ function renderScheduleByRoom(schedule) {
     byRoomGroupData.clear();
     byRoomItemData.clear();
 
+    // Check if schedule.rooms exists and is an array
+    if (!schedule.rooms || !Array.isArray(schedule.rooms)) {
+        console.warn('schedule.rooms is not available or not an array:', schedule.rooms);
+        return;
+    }
+
     $.each(schedule.rooms.sort((e1, e2) => e1.name.localeCompare(e2.name)), (_, room) => {
         let content = `<div class="d-flex flex-column"><div><h5 class="card-title mb-1">${room.name}</h5></div>`;
         byRoomGroupData.add({
@@ -139,11 +155,23 @@ function renderScheduleByRoom(schedule) {
     });
 
     const meetingMap = new Map();
-    schedule.meetings.forEach(m => meetingMap.set(m.id, m));
+    if (schedule.meetings && Array.isArray(schedule.meetings)) {
+        schedule.meetings.forEach(m => meetingMap.set(m.id, m));
+    }
     const timeGrainMap = new Map();
-    schedule.timeGrains.forEach(t => timeGrainMap.set(t.id, t));
+    if (schedule.timeGrains && Array.isArray(schedule.timeGrains)) {
+        schedule.timeGrains.forEach(t => timeGrainMap.set(t.id, t));
+    }
     const roomMap = new Map();
-    schedule.rooms.forEach(r => roomMap.set(r.id, r));
+    if (schedule.rooms && Array.isArray(schedule.rooms)) {
+        schedule.rooms.forEach(r => roomMap.set(r.id, r));
+    }
+    
+    if (!schedule.meetingAssignments || !Array.isArray(schedule.meetingAssignments)) {
+        console.warn('schedule.meetingAssignments is not available or not an array:', schedule.meetingAssignments);
+        return;
+    }
+    
     $.each(schedule.meetingAssignments, (_, assignment) => {
         // Handle both string ID and full object for meeting reference
         const meet = typeof assignment.meeting === 'string' ? meetingMap.get(assignment.meeting) : assignment.meeting;
@@ -193,6 +221,12 @@ function renderScheduleByPerson(schedule) {
     byPersonGroupData.clear();
     byPersonItemData.clear();
 
+    // Check if schedule.people exists and is an array
+    if (!schedule.people || !Array.isArray(schedule.people)) {
+        console.warn('schedule.people is not available or not an array:', schedule.people);
+        return;
+    }
+
     $.each(schedule.people.sort((e1, e2) => e1.fullName.localeCompare(e2.fullName)), (_, person) => {
         let content = `<div class="d-flex flex-column"><div><h5 class="card-title mb-1">${person.fullName}</h5></div>`;
         byPersonGroupData.add({
@@ -201,11 +235,23 @@ function renderScheduleByPerson(schedule) {
         });
     });
     const meetingMap = new Map();
-    schedule.meetings.forEach(m => meetingMap.set(m.id, m));
+    if (schedule.meetings && Array.isArray(schedule.meetings)) {
+        schedule.meetings.forEach(m => meetingMap.set(m.id, m));
+    }
     const timeGrainMap = new Map();
-    schedule.timeGrains.forEach(t => timeGrainMap.set(t.id, t));
+    if (schedule.timeGrains && Array.isArray(schedule.timeGrains)) {
+        schedule.timeGrains.forEach(t => timeGrainMap.set(t.id, t));
+    }
     const roomMap = new Map();
-    schedule.rooms.forEach(r => roomMap.set(r.id, r));
+    if (schedule.rooms && Array.isArray(schedule.rooms)) {
+        schedule.rooms.forEach(r => roomMap.set(r.id, r));
+    }
+    
+    if (!schedule.meetingAssignments || !Array.isArray(schedule.meetingAssignments)) {
+        console.warn('schedule.meetingAssignments is not available or not an array:', schedule.meetingAssignments);
+        return;
+    }
+    
     $.each(schedule.meetingAssignments, (_, assignment) => {
         // Handle both string ID and full object for meeting reference
         const meet = typeof assignment.meeting === 'string' ? meetingMap.get(assignment.meeting) : assignment.meeting;
@@ -270,6 +316,12 @@ function renderScheduleByPerson(schedule) {
 
 
 function solve() {
+    if (!loadedSchedule) {
+        showError("No schedule data loaded. Please wait for the data to load or refresh the page.");
+        return;
+    }
+    
+    console.log('Sending schedule data for solving:', loadedSchedule);
     $.post("/schedules", JSON.stringify(loadedSchedule), function (data) {
         scheduleId = data;
         refreshSolvingButtons(true);
