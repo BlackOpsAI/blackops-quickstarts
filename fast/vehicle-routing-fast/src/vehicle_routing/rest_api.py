@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Request, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from uuid import uuid4
 from typing import Dict
@@ -6,7 +6,7 @@ from dataclasses import asdict
 
 from .domain import VehicleRoutePlan
 from .converters import plan_to_model, model_to_plan
-from .domain import VehicleRoutePlanModel, VehicleModel, VisitModel
+from .domain import VehicleRoutePlanModel
 from .score_analysis import ConstraintAnalysisDTO, MatchAnalysisDTO
 from .demo_data import generate_demo_data, DemoData
 from .solver import solver_manager, solution_manager
@@ -15,11 +15,27 @@ app = FastAPI(docs_url='/q/swagger-ui')
 
 data_sets: Dict[str, VehicleRoutePlan] = {}
 
-@app.get("/demo-data", response_model=VehicleRoutePlanModel)
-async def get_demo_data() -> VehicleRoutePlanModel:
-    """Get a single demo data set (always the same for simplicity)."""
-    domain_plan = generate_demo_data(DemoData.PHILADELPHIA)
-    return plan_to_model(domain_plan)
+
+def json_to_vehicle_route_plan(json_data: dict) -> VehicleRoutePlan:
+    """Convert JSON data to VehicleRoutePlan using the model converters."""
+    plan_model = VehicleRoutePlanModel.model_validate(json_data)
+    return model_to_plan(plan_model)
+
+
+@app.get("/demo-data")
+async def get_demo_data():
+    """Get available demo data sets."""
+    return [demo.name for demo in DemoData]
+
+@app.get("/demo-data/{demo_name}", response_model=VehicleRoutePlanModel)
+async def get_demo_data_by_name(demo_name: str) -> VehicleRoutePlanModel:
+    """Get a specific demo data set."""
+    try:
+        demo_data = DemoData[demo_name]
+        domain_plan = generate_demo_data(demo_data)
+        return plan_to_model(domain_plan)
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"Demo data '{demo_name}' not found")
 
 @app.get("/route-plans/{problem_id}", response_model=VehicleRoutePlanModel, response_model_exclude_none=True)
 async def get_route(problem_id: str) -> VehicleRoutePlanModel:
@@ -30,11 +46,8 @@ async def get_route(problem_id: str) -> VehicleRoutePlanModel:
     return plan_to_model(route)
 
 @app.post("/route-plans")
-async def solve_route(request: Request) -> str:
-    json_data = await request.json()
+async def solve_route(plan_model: VehicleRoutePlanModel) -> str:
     job_id = str(uuid4())
-    # Parse the incoming JSON using Pydantic models
-    plan_model = VehicleRoutePlanModel.model_validate(json_data)
     # Convert to domain model for solver
     domain_plan = model_to_plan(plan_model)
     data_sets[job_id] = domain_plan
@@ -46,9 +59,7 @@ async def solve_route(request: Request) -> str:
     return job_id
 
 @app.put("/route-plans/analyze")
-async def analyze_route(request: Request) -> dict:
-    json_data = await request.json()
-    plan_model = VehicleRoutePlanModel.model_validate(json_data)
+async def analyze_route(plan_model: VehicleRoutePlanModel) -> dict:
     domain_plan = model_to_plan(plan_model)
     analysis = solution_manager.analyze(domain_plan)
     constraints = []
