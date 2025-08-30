@@ -1,4 +1,4 @@
-from timefold.solver.score import (constraint_provider, ConstraintFactory, Joiners, HardSoftDecimalScore, ConstraintCollectors)
+from blackops_legacy.solver.score import (constraint_provider, ConstraintFactory, Joiners, HardSoftDecimalScore, ConstraintCollectors)
 from datetime import datetime, date
 
 from .domain import Employee, Shift
@@ -131,4 +131,3 @@ def balance_employee_shift_assignments(constraint_factory: ConstraintFactory):
             .penalize_decimal(HardSoftDecimalScore.ONE_SOFT, lambda load_balance: load_balance.unfairness())
             .as_constraint("Balance employee shift assignments")
             )
-

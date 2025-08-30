@@ -1,4 +1,4 @@
-from timefold.solver.score import (constraint_provider, HardMediumSoftScore, Joiners,
+from blackops_legacy.solver.score import (constraint_provider, HardMediumSoftScore, Joiners,
                                    ConstraintFactory, Constraint)
 
 from .domain import *
@@ -103,7 +103,7 @@ def required_attendance_conflict(constraint_factory: ConstraintFactory) -> Const
                                     lambda assignment: assignment.get_grain_index(),
                                     lambda assignment: assignment.get_last_time_grain_index() + 1))
             .penalize(HardMediumSoftScore.ONE_HARD,
-                     lambda left_required, right_required, left_assignment, right_assignment: 
+                     lambda left_required, right_required, left_assignment, right_assignment:
                      right_assignment.calculate_overlap(left_assignment))
             .as_constraint("Required attendance conflict"))
 
@@ -144,7 +144,7 @@ def start_and_end_on_same_day(constraint_factory: ConstraintFactory) -> Constrai
             .join(TimeGrain,
                  Joiners.equal(lambda meeting_assignment: meeting_assignment.get_last_time_grain_index(),
                               lambda time_grain: time_grain.grain_index),
-                 Joiners.filtering(lambda meeting_assignment, time_grain: 
+                 Joiners.filtering(lambda meeting_assignment, time_grain:
                                   meeting_assignment.starting_time_grain.day_of_year != time_grain.day_of_year))
             .penalize(HardMediumSoftScore.ONE_HARD)
             .as_constraint("Start and end on same day"))
@@ -181,7 +181,7 @@ def required_and_preferred_attendance_conflict(constraint_factory: ConstraintFac
                                     lambda assignment: assignment.get_grain_index(),
                                     lambda assignment: assignment.get_last_time_grain_index() + 1))
             .penalize(HardMediumSoftScore.ONE_MEDIUM,
-                     lambda required, preferred, left_assignment, right_assignment: 
+                     lambda required, preferred, left_assignment, right_assignment:
                      right_assignment.calculate_overlap(left_assignment))
             .as_constraint("Required and preferred attendance conflict"))
 
@@ -211,7 +211,7 @@ def preferred_attendance_conflict(constraint_factory: ConstraintFactory) -> Cons
                                     lambda assignment: assignment.get_grain_index(),
                                     lambda assignment: assignment.get_last_time_grain_index() + 1))
             .penalize(HardMediumSoftScore.ONE_MEDIUM,
-                     lambda left_attendance, right_attendance, left_assignment, right_assignment: 
+                     lambda left_attendance, right_attendance, left_assignment, right_assignment:
                      right_assignment.calculate_overlap(left_assignment))
             .as_constraint("Preferred attendance conflict"))
 
@@ -326,7 +326,7 @@ def room_stability(constraint_factory: ConstraintFactory) -> Constraint:
                 .join(attendance_type,
                       Joiners.equal(lambda left_attendance: left_attendance.person,
                                    lambda right_attendance: right_attendance.person),
-                      Joiners.filtering(lambda left_attendance, right_attendance: 
+                      Joiners.filtering(lambda left_attendance, right_attendance:
                                        left_attendance.meeting_id != right_attendance.meeting_id))
                 .join(MeetingAssignment,
                       Joiners.equal(lambda left_attendance, right_attendance: left_attendance.meeting_id,
@@ -336,16 +336,16 @@ def room_stability(constraint_factory: ConstraintFactory) -> Constraint:
                                    lambda assignment: assignment.meeting.id),
                       Joiners.less_than(lambda left_attendance, right_attendance, left_assignment: left_assignment.get_grain_index(),
                                        lambda assignment: assignment.get_grain_index()),
-                      Joiners.filtering(lambda left_attendance, right_attendance, left_assignment, right_assignment: 
+                      Joiners.filtering(lambda left_attendance, right_attendance, left_assignment, right_assignment:
                                        left_assignment.room != right_assignment.room),
-                      Joiners.filtering(lambda left_attendance, right_attendance, left_assignment, right_assignment: 
-                                       right_assignment.get_grain_index() - 
-                                       left_assignment.meeting.duration_in_grains - 
+                      Joiners.filtering(lambda left_attendance, right_attendance, left_assignment, right_assignment:
+                                       right_assignment.get_grain_index() -
+                                       left_assignment.meeting.duration_in_grains -
                                        left_assignment.get_grain_index() <= 2))
                 .penalize(HardMediumSoftScore.ONE_SOFT))
-    
+
     # Combine both required and preferred attendance stability
-    # Note: Since Python Timefold doesn't have constraint combining like Java, 
+    # Note: Since Python Timefold doesn't have constraint combining like Java,
     # we'll use the required attendance version as the primary one
     # TODO: In a full implementation, both streams would need to be properly combined
     return create_attendance_stability_stream(RequiredAttendance).as_constraint("Room stability")

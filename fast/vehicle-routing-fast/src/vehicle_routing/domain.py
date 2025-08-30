@@ -1,6 +1,6 @@
-from timefold.solver import SolverStatus
-from timefold.solver.score import HardSoftScore
-from timefold.solver.domain import *
+from blackops_legacy.solver import SolverStatus
+from blackops_legacy.solver.score import HardSoftScore
+from blackops_legacy.solver.domain import *
 
 from datetime import datetime, timedelta
 from typing import Annotated, Optional, List, Union

@@ -204,7 +204,7 @@ def model_to_meeting_assignment(model: MeetingAssignmentModel, meeting_lookup: d
         meeting = meeting_lookup[model.meeting]
     else:
         meeting = model_to_meeting(model.meeting)
-    
+
     # Handle room reference
     room = None
     if model.room:
@@ -212,7 +212,7 @@ def model_to_meeting_assignment(model: MeetingAssignmentModel, meeting_lookup: d
             room = room_lookup[model.room]
         else:
             room = model_to_room(model.room)
-    
+
     # Handle time grain reference
     starting_time_grain = None
     if model.starting_time_grain:
@@ -220,7 +220,7 @@ def model_to_meeting_assignment(model: MeetingAssignmentModel, meeting_lookup: d
             starting_time_grain = time_grain_lookup[model.starting_time_grain]
         else:
             starting_time_grain = model_to_time_grain(model.starting_time_grain)
-    
+
     return domain.MeetingAssignment(
         id=model.id,
         meeting=meeting,
@@ -236,33 +236,33 @@ def model_to_schedule(model: MeetingScheduleModel) -> domain.MeetingSchedule:
     time_grains = [model_to_time_grain(tg) for tg in model.time_grains]
     rooms = [model_to_room(r) for r in model.rooms]
     meetings = [model_to_meeting(m) for m in model.meetings]
-    
+
     # Create lookup dictionaries for references
     meeting_lookup = {m.id: m for m in meetings}
     room_lookup = {r.id: r for r in rooms}
     time_grain_lookup = {tg.id: tg for tg in time_grains}
-    
+
     # Convert meeting assignments with lookups
     meeting_assignments = [
         model_to_meeting_assignment(ma, meeting_lookup, room_lookup, time_grain_lookup)
         for ma in model.meeting_assignments
     ]
-    
+
     # Convert attendances
     required_attendances = [model_to_required_attendance(ra) for ra in model.required_attendances]
     preferred_attendances = [model_to_preferred_attendance(pa) for pa in model.preferred_attendances]
-    
+
     # Handle score
     score = None
     if model.score:
-        from timefold.solver.score import HardMediumSoftScore
+        from blackops_legacy.solver.score import HardMediumSoftScore
         score = HardMediumSoftScore.parse(model.score)
-    
-    # Handle solver status  
+
+    # Handle solver status
     solver_status = domain.SolverStatus.NOT_SOLVING
     if model.solver_status:
         solver_status = domain.SolverStatus[model.solver_status]
-    
+
     return domain.MeetingSchedule(
         people=people,
         time_grains=time_grains,
@@ -273,4 +273,4 @@ def model_to_schedule(model: MeetingScheduleModel) -> domain.MeetingSchedule:
         meeting_assignments=meeting_assignments,
         score=score,
         solver_status=solver_status
-    ) 
+    )

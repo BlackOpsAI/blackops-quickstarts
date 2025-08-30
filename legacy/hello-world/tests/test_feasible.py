@@ -1,5 +1,5 @@
-from timefold.solver import SolverFactory
-from timefold.solver.config import (SolverConfig, ScoreDirectorFactoryConfig,
+from blackops_legacy.solver import SolverFactory
+from blackops_legacy.solver.config import (SolverConfig, ScoreDirectorFactoryConfig,
                                     TerminationConfig, Duration, TerminationCompositionStyle)
 
 from hello_world.domain import *

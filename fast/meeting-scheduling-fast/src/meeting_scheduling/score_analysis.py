@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Any, Annotated
-from timefold.solver.score import HardMediumSoftScore
+from blackops_legacy.solver.score import HardMediumSoftScore
 from .json_serialization import ScoreSerializer
 
 class MatchAnalysisDTO(BaseModel):

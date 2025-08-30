@@ -1,11 +1,11 @@
 from typing import List, Optional, Annotated, Any
-from timefold.solver.domain import (
+from blackops_legacy.solver.domain import (
     planning_entity, planning_solution, PlanningId, PlanningVariable,
     PlanningEntityCollectionProperty, ProblemFactCollectionProperty, ValueRangeProvider,
     PlanningScore, PlanningPin
 )
-from timefold.solver import SolverStatus
-from timefold.solver.score import HardMediumSoftScore
+from blackops_legacy.solver import SolverStatus
+from blackops_legacy.solver.score import HardMediumSoftScore
 from pydantic import BaseModel, Field, ConfigDict, PlainSerializer, BeforeValidator, ValidationInfo
 from pydantic.alias_generators import to_camel
 
@@ -82,10 +82,10 @@ class JsonDomainBase(BaseModel):
 class Person(JsonDomainBase):
     id: Annotated[str, PlanningId]
     full_name: str
-    
+
     def __hash__(self) -> int:
         return hash(self.id)
-    
+
     def __eq__(self, other) -> bool:
         if not isinstance(other, Person):
             return False
@@ -96,10 +96,10 @@ class TimeGrain(JsonDomainBase):
     grain_index: int
     day_of_year: int
     starting_minute_of_day: int
-    
+
     def __hash__(self) -> int:
         return hash(self.id)
-    
+
     def __eq__(self, other) -> bool:
         if not isinstance(other, TimeGrain):
             return False
@@ -109,10 +109,10 @@ class Room(JsonDomainBase):
     id: Annotated[str, PlanningId]
     name: str
     capacity: int
-    
+
     def __hash__(self) -> int:
         return hash(self.id)
-    
+
     def __eq__(self, other) -> bool:
         if not isinstance(other, Room):
             return False
@@ -149,16 +149,16 @@ class Meeting(JsonDomainBase):
         if any(r.person.id == person.id for r in self.required_attendances):
             raise ValueError(f"The person {person.id} is already assigned to the meeting {self.id}.")
         self.required_attendances.append(
-            RequiredAttendance(id=f"{self.id}-{self.get_required_capacity() + 1}", 
-                              meeting_id=self.id, 
+            RequiredAttendance(id=f"{self.id}-{self.get_required_capacity() + 1}",
+                              meeting_id=self.id,
                               person=person))
 
     def add_preferred_attendant(self, person: Person) -> None:
         if any(p.person.id == person.id for p in self.preferred_attendances):
             raise ValueError(f"The person {person.id} is already assigned to the meeting {self.id}.")
         self.preferred_attendances.append(
-            PreferredAttendance(id=f"{self.id}-{self.get_required_capacity() + 1}", 
-                               meeting_id=self.id, 
+            PreferredAttendance(id=f"{self.id}-{self.get_required_capacity() + 1}",
+                               meeting_id=self.id,
                                person=person))
 
 
@@ -178,16 +178,16 @@ class MeetingAssignment(JsonDomainBase):
     def calculate_overlap(self, other: "MeetingAssignment") -> int:
         if self.starting_time_grain is None or other.starting_time_grain is None:
             return 0
-        
+
         # start is inclusive, end is exclusive
         start = self.starting_time_grain.grain_index
         end = self.get_last_time_grain_index() + 1
         other_start = other.starting_time_grain.grain_index
         other_end = other.get_last_time_grain_index() + 1
-        
+
         if other_end < start or end < other_start:
             return 0
-        
+
         return min(end, other_end) - max(start, other_start)
 
     def get_last_time_grain_index(self) -> Optional[int]:

@@ -1,8 +1,8 @@
-from timefold.solver.domain import (planning_entity, planning_solution, PlanningId, PlanningVariable,
+from blackops_legacy.solver.domain import (planning_entity, planning_solution, PlanningId, PlanningVariable,
                                     PlanningEntityCollectionProperty,
                                     ProblemFactCollectionProperty, ValueRangeProvider,
                                     PlanningScore)
-from timefold.solver.score import HardSoftScore
+from blackops_legacy.solver.score import HardSoftScore
 from dataclasses import dataclass, field
 from datetime import time
 from typing import Annotated

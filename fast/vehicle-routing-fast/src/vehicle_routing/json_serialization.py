@@ -1,4 +1,4 @@
-from timefold.solver.score import HardSoftScore
+from blackops_legacy.solver.score import HardSoftScore
 
 from typing import Any
 from datetime import timedelta

@@ -1,4 +1,4 @@
-from timefold.solver.score import ConstraintJustification
+from blackops_legacy.solver.score import ConstraintJustification
 from dataclasses import dataclass, field
 
 from .json_serialization import *

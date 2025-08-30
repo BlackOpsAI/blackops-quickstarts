@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime, date
 
-from timefold.solver.test import ConstraintVerifier
+from blackops_legacy.solver.test import ConstraintVerifier
 
 from flight_crew_scheduling.domain import *
 from flight_crew_scheduling.constraints import *

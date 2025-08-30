@@ -1,10 +1,10 @@
-from timefold.solver import SolverStatus
-from timefold.solver.domain import (
+from blackops_legacy.solver import SolverStatus
+from blackops_legacy.solver.domain import (
     planning_entity, planning_solution, PlanningId, PlanningVariable,
     PlanningEntityCollectionProperty, ProblemFactCollectionProperty, ValueRangeProvider,
     PlanningScore
 )
-from timefold.solver.score import HardSoftDecimalScore
+from blackops_legacy.solver.score import HardSoftDecimalScore
 from datetime import datetime, date
 from typing import Annotated, List, Optional, Union
 from dataclasses import dataclass, field

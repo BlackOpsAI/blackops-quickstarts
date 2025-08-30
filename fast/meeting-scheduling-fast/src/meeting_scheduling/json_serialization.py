@@ -1,4 +1,4 @@
-from timefold.solver.score import HardMediumSoftScore
+from blackops_legacy.solver.score import HardMediumSoftScore
 from pydantic import BaseModel, ConfigDict, Field, PlainSerializer, BeforeValidator, ValidationInfo
 from pydantic.alias_generators import to_camel
 from typing import Annotated, Any
@@ -44,4 +44,4 @@ class JsonDomainBase(BaseModel):
         alias_generator=to_camel,
         populate_by_name=True,
         from_attributes=True,
-    ) 
+    )

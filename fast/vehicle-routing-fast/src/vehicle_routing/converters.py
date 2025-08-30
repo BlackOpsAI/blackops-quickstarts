@@ -65,7 +65,7 @@ def model_to_visit(model: domain.VisitModel, vehicle_lookup: dict, visit_lookup:
         else:
             # This shouldn't happen in practice, but handle it for completeness
             vehicle = vehicle_lookup[model.vehicle.id]
-    
+
     # Handle previous visit reference
     previous_visit = None
     if model.previous_visit:
@@ -73,7 +73,7 @@ def model_to_visit(model: domain.VisitModel, vehicle_lookup: dict, visit_lookup:
             previous_visit = visit_lookup[model.previous_visit]
         else:
             previous_visit = visit_lookup[model.previous_visit.id]
-    
+
     # Handle next visit reference
     next_visit = None
     if model.next_visit:
@@ -81,7 +81,7 @@ def model_to_visit(model: domain.VisitModel, vehicle_lookup: dict, visit_lookup:
             next_visit = visit_lookup[model.next_visit]
         else:
             next_visit = visit_lookup[model.next_visit.id]
-    
+
     return domain.Visit(
         id=model.id,
         name=model.name,
@@ -105,7 +105,7 @@ def model_to_vehicle(model: domain.VehicleModel, visit_lookup: dict) -> domain.V
             visits.append(visit_lookup[visit_ref])
         else:
             visits.append(visit_lookup[visit_ref.id])
-    
+
     return domain.Vehicle(
         id=model.id,
         capacity=model.capacity,
@@ -119,7 +119,7 @@ def model_to_plan(model: domain.VehicleRoutePlanModel) -> domain.VehicleRoutePla
     # Convert basic collections first
     vehicles = []
     visits = []
-    
+
     # Convert visits first (they don't depend on vehicles)
     for visit_model in model.visits:
         visit = domain.Visit(
@@ -136,10 +136,10 @@ def model_to_plan(model: domain.VehicleRoutePlanModel) -> domain.VehicleRoutePla
             arrival_time=datetime.fromisoformat(visit_model.arrival_time) if visit_model.arrival_time else None
         )
         visits.append(visit)
-    
+
     # Create lookup dictionaries
     visit_lookup = {v.id: v for v in visits}
-    
+
     # Convert vehicles
     for vehicle_model in model.vehicles:
         vehicle = domain.Vehicle(
@@ -150,34 +150,34 @@ def model_to_plan(model: domain.VehicleRoutePlanModel) -> domain.VehicleRoutePla
             visits=[]
         )
         vehicles.append(vehicle)
-    
+
     # Create vehicle lookup
     vehicle_lookup = {v.id: v for v in vehicles}
-    
+
     # Now set up the relationships
     for i, visit_model in enumerate(model.visits):
         visit = visits[i]
-        
+
         # Set vehicle reference
         if visit_model.vehicle:
             if isinstance(visit_model.vehicle, str):
                 visit.vehicle = vehicle_lookup[visit_model.vehicle]
             else:
                 visit.vehicle = vehicle_lookup[visit_model.vehicle.id]
-        
+
         # Set previous/next visit references
         if visit_model.previous_visit:
             if isinstance(visit_model.previous_visit, str):
                 visit.previous_visit = visit_lookup[visit_model.previous_visit]
             else:
                 visit.previous_visit = visit_lookup[visit_model.previous_visit.id]
-        
+
         if visit_model.next_visit:
             if isinstance(visit_model.next_visit, str):
                 visit.next_visit = visit_lookup[visit_model.next_visit]
             else:
                 visit.next_visit = visit_lookup[visit_model.next_visit.id]
-    
+
     # Set up vehicle visits lists
     for vehicle_model in model.vehicles:
         vehicle = vehicle_lookup[vehicle_model.id]
@@ -186,18 +186,18 @@ def model_to_plan(model: domain.VehicleRoutePlanModel) -> domain.VehicleRoutePla
                 vehicle.visits.append(visit_lookup[visit_ref])
             else:
                 vehicle.visits.append(visit_lookup[visit_ref.id])
-    
+
     # Handle score
     score = None
     if model.score:
-        from timefold.solver.score import HardSoftScore
+        from blackops_legacy.solver.score import HardSoftScore
         score = HardSoftScore.parse(model.score)
-    
+
     # Handle solver status
     solver_status = domain.SolverStatus.NOT_SOLVING
     if model.solver_status:
         solver_status = domain.SolverStatus[model.solver_status]
-    
+
     return domain.VehicleRoutePlan(
         name=model.name,
         south_west_corner=model_to_location(model.south_west_corner),
@@ -206,4 +206,4 @@ def model_to_plan(model: domain.VehicleRoutePlanModel) -> domain.VehicleRoutePla
         visits=visits,
         score=score,
         solver_status=solver_status
-    ) 
+    )

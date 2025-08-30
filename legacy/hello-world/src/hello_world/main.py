@@ -1,6 +1,6 @@
-from timefold.solver.config import (SolverConfig, ScoreDirectorFactoryConfig,
+from blackops_legacy.solver.config import (SolverConfig, ScoreDirectorFactoryConfig,
                                     TerminationConfig, Duration)
-from timefold.solver import SolverFactory
+from blackops_legacy.solver import SolverFactory
 from enum import Enum
 from datetime import time
 import logging
@@ -123,7 +123,7 @@ def generate_demo_data(demo_data: 'DemoData') -> Timetable:
         lessons.append(Lesson(next(ids), "Physical education", "C. Lewis", "10th grade"))
         lessons.append(Lesson(next(ids), "Physical education", "C. Lewis", "10th grade"))
         lessons.append(Lesson(next(ids), "Physical education", "C. Lewis", "10th grade"))
-    
+
         lessons.append(Lesson(next(ids), "Math", "A. Turing", "11th grade"))
         lessons.append(Lesson(next(ids), "Math", "A. Turing", "11th grade"))
         lessons.append(Lesson(next(ids), "Math", "A. Turing", "11th grade"))
@@ -149,7 +149,7 @@ def generate_demo_data(demo_data: 'DemoData') -> Timetable:
         lessons.append(Lesson(next(ids), "Physical education", "C. Lewis", "11th grade"))
         lessons.append(Lesson(next(ids), "Physical education", "C. Lewis", "11th grade"))
         lessons.append(Lesson(next(ids), "Physical education", "C. Lewis", "11th grade"))
-    
+
         lessons.append(Lesson(next(ids), "Math", "A. Turing", "12th grade"))
         lessons.append(Lesson(next(ids), "Math", "A. Turing", "12th grade"))
         lessons.append(Lesson(next(ids), "Math", "A. Turing", "12th grade"))

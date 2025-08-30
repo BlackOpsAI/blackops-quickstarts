@@ -1,4 +1,4 @@
-from timefold.solver.score import HardMediumSoftDecimalScore, ConstraintJustification
+from blackops_legacy.solver.score import HardMediumSoftDecimalScore, ConstraintJustification
 from pydantic import BaseModel, ConfigDict, Field, PlainSerializer, BeforeValidator, ValidationInfo
 from pydantic.alias_generators import to_camel
 from typing import Any, Dict

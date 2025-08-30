@@ -1,4 +1,4 @@
-from timefold.solver.test import ConstraintVerifier
+from blackops_legacy.solver.test import ConstraintVerifier
 
 from sports_league_scheduling.domain import *
 from sports_league_scheduling.constraints import *

@@ -1,4 +1,4 @@
-from timefold.solver.score import HardSoftDecimalScore
+from blackops_legacy.solver.score import HardSoftDecimalScore
 from typing import Any
 from pydantic import BaseModel, ConfigDict, PlainSerializer, BeforeValidator
 from pydantic.alias_generators import to_camel

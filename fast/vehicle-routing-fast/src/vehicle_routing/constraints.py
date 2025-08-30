@@ -1,4 +1,4 @@
-from timefold.solver.score import ConstraintFactory, HardSoftScore, constraint_provider
+from blackops_legacy.solver.score import ConstraintFactory, HardSoftScore, constraint_provider
 
 from .domain import *
 

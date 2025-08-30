@@ -55,7 +55,7 @@ def model_to_shift(model: domain.ShiftModel, employee_lookup: dict) -> domain.Sh
             employee = employee_lookup[model.employee]
         else:
             employee = model_to_employee(model.employee)
-    
+
     return domain.Shift(
         id=model.id,
         start=datetime.fromisoformat(model.start),
@@ -69,30 +69,30 @@ def model_to_shift(model: domain.ShiftModel, employee_lookup: dict) -> domain.Sh
 def model_to_schedule(model: domain.EmployeeScheduleModel) -> domain.EmployeeSchedule:
     # Convert employees first
     employees = [model_to_employee(e) for e in model.employees]
-    
+
     # Create lookup dictionary for employee references
     employee_lookup = {e.name: e for e in employees}
-    
+
     # Convert shifts with employee lookups
     shifts = [
         model_to_shift(s, employee_lookup)
         for s in model.shifts
     ]
-    
+
     # Handle score
     score = None
     if model.score:
-        from timefold.solver.score import HardSoftDecimalScore
+        from blackops_legacy.solver.score import HardSoftDecimalScore
         score = HardSoftDecimalScore.parse(model.score)
-    
+
     # Handle solver status
     solver_status = domain.SolverStatus.NOT_SOLVING
     if model.solver_status:
         solver_status = domain.SolverStatus[model.solver_status]
-    
+
     return domain.EmployeeSchedule(
         employees=employees,
         shifts=shifts,
         score=score,
         solver_status=solver_status
-    ) 
+    )

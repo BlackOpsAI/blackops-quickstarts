@@ -1,4 +1,4 @@
-from timefold.solver.score import (constraint_provider, HardSoftScore, Joiners,
+from blackops_legacy.solver.score import (constraint_provider, HardSoftScore, Joiners,
                                    ConstraintFactory, Constraint)
 from datetime import time
 

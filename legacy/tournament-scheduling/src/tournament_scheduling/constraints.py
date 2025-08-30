@@ -1,4 +1,4 @@
-from timefold.solver.score import *
+from blackops_legacy.solver.score import *
 from datetime import time
 from typing import Final
 
